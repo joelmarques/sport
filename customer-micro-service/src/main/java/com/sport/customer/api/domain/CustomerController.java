@@ -25,7 +25,7 @@ public class CustomerController {
 	private CustomerService customerService;
 	
 	@PostMapping
-	public ResponseEntity<?> save(@RequestBody final Customer customer) {
+	public ResponseEntity<Response> save(@RequestBody final Customer customer) {
 		
 		try {
 			
@@ -33,17 +33,17 @@ public class CustomerController {
 			
 			final List<Campaign> campaigns = this.connectAllCampaign(c);
 			
-			return new ResponseEntity<>(campaigns, HttpStatus.CREATED);
+			return new ResponseEntity<Response>(new Response(Constants.SUCCESS, campaigns), HttpStatus.CREATED);
 			
 		} catch (DuplicateRegistrationException e) {
 			final List<Campaign> campaigns = this.connectPartialCampaign(this.customerService.findByEmail(customer.getEmail()));
-			return new ResponseEntity<>(campaigns, HttpStatus.OK);
+			return new ResponseEntity<Response>(new Response(Constants.DUPLICATE, campaigns), HttpStatus.OK);
 		}		
 	}
 
 	private List<Campaign> connectAllCampaign(Customer c) {
 		
-		URI uri = UriComponentsBuilder.fromUriString("http://localhost:8080/api/campaigns")
+		URI uri = UriComponentsBuilder.fromUriString(Constants.URI_CAMPAIGN)
 									 .path("/connect/all")
 									 .queryParam("idCustomer", c.getId())
 									 .queryParam("idSoccerTeam", c.getIdSoccerTeam())
@@ -55,7 +55,7 @@ public class CustomerController {
 	
 	private List<Campaign> connectPartialCampaign(Customer c) {
 		
-		URI uri = UriComponentsBuilder.fromUriString("http://localhost:8080/api/campaigns")
+		URI uri = UriComponentsBuilder.fromUriString(Constants.URI_CAMPAIGN)
 				 .path("/connect/partial")
 				 .queryParam("idCustomer", c.getId())
 				 .queryParam("idSoccerTeam", c.getIdSoccerTeam())

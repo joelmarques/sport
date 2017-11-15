@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sport.campaign.api.exception.NoContentException;
-import com.sport.customer.Customer;
-import com.sport.customer.CustomerRepository;
 
 @Service("campaignService")
 public class DefaultCampaignService implements CampaignService {
@@ -20,7 +18,7 @@ public class DefaultCampaignService implements CampaignService {
 	private CampaignRepository campaignRepository;
 	
 	@Autowired
-	private CustomerRepository customerRepository;
+	private CampaignCustomerRepository campaignCustomerRepository;
 	
 	@Override
 	public Collection<Campaign> findAll() throws NoContentException {
@@ -84,33 +82,34 @@ public class DefaultCampaignService implements CampaignService {
 		
 		final List<Campaign> campaigns = this.findByIdSoccerTeam(idSoccerTeam);
 		
-		final Customer customer = this.customerRepository.findOne(idCustomer);
-		customer.setCampaigns(campaigns);
+		this.connectCampaigns(idCustomer, idSoccerTeam, campaigns);
 		
-		this.customerRepository.save(customer);
 		return campaigns;
 	}
 	
 	private List<Campaign> findByIdSoccerTeam(final Long idSoccerTeam) {
 		return this.campaignRepository.findByIdSoccerTeamAndFinalPeriodGreaterThanEqual(idSoccerTeam, Calendar.getInstance());
 	}
+	
+	private void connectCampaigns(final Long idCustomer, final Long idSoccerTeam, final List<Campaign> campaigns) {
+		
+		campaigns.stream().forEach(c -> campaignCustomerRepository.save(new CampaignCustomer(idCustomer, c.getId(), idSoccerTeam)));
+	}
 
 	@Override
 	public List<Campaign> partialConnect(final Long idCustomer, final Long idSoccerTeam) {
 		
-		final Customer customer = this.customerRepository.findOne(idCustomer);
+		final List<CampaignCustomer> campaignCustomers = this.campaignCustomerRepository.findByIdCustomerAndIdSoccerTeam(idCustomer, idSoccerTeam);
 		
-		final List<Campaign> campaigns = this.findByIdSoccerTeam(idSoccerTeam, this.getIds(customer.getCampaigns()));
+		final List<Campaign> campaigns = this.findByIdSoccerTeam(idSoccerTeam, this.getCampaignsIds(campaignCustomers));
 		
-		customer.getCampaigns().addAll(campaigns);
-		
-		this.customerRepository.save(customer);
+		this.connectCampaigns(idCustomer, idSoccerTeam, campaigns);
 		
 		return campaigns;
 	}
 	
-	private List<Long> getIds(final List<Campaign> campaigns) {
-		return campaigns.stream().map(Campaign::getId).collect(Collectors.toList());
+	private List<Long> getCampaignsIds(final List<CampaignCustomer> campaignCustomers) {
+		return campaignCustomers.stream().map(CampaignCustomer::getIdCampaign).collect(Collectors.toList());
 	}
 	
 	private List<Campaign> findByIdSoccerTeam(final Long idSoccerTeam, final List<Long> campaignsIds) {
