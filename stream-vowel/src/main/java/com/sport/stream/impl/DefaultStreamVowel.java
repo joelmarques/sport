@@ -1,8 +1,14 @@
 package com.sport.stream.impl;
 
-import com.sport.stream.api.Streamable;
+import com.sport.stream.api.Stream;
 
-public class StreamVowelReader implements Streamable {
+public class DefaultStreamVowel implements Stream {
+	
+	private String input;
+	
+	public DefaultStreamVowel(String input) {
+		this.input = input;
+	}
 
 	@Override
 	public boolean hasNext() {
