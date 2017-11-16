@@ -25,3 +25,8 @@ List<Produto> produtos = buscarProdutos();
         
 List<Produto> produtosDisponiveisParaVenda = produtos.parallelStream().filter(produto -> getEstoqueDisponivel(produto) > 0).collect(Collectors.toList());
 ```
+
+# TODO
+Para realizar o tratamento do Fallback, caso algum servico esteja indisponivel, para facilitar a localização dos recursos e diminuir a interdependência entre eles pode-se utilizar o Spring Cloud Eureka da Netflix.
+
+Para realizar a troca de mensagens entre os servicos, como para avisar quando uma campanha for alterada, pode-se utilizar o Spring AMQP onde se configura um sender e um listener para a troca de mensagens.
