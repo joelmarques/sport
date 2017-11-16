@@ -1,5 +1,8 @@
-# Microservices
+# Arquitetura de Microservices
+
 Arquitetura de Microservices para cadastros de campanhas de esporte e socio torcedor utilizando Spring Boot, Spring AMQP, Spring Cloud, Spring Data JPA, Base de dados H2 em memória, Tomcat, REST.
+
+Foi escolhido Spring Boot pela vantagem de facilitar o processo de configuração e publicação de aplicações. Com base na convenção sobre a configuração. Com ele foi possivel utilizar por exemplo um tomcat embarcado e um banco de dados H2 em memoria, agilizando o desenvolvimento.
 
 # Deadlock
 
